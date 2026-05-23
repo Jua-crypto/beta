@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>X-Stand — Extend Your Life</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0a08;
+  --bg2:#111110;
+  --bg3:#181815;
+  --wood:#c8a96e;
+  --wood2:#e8c98a;
+  --wood3:#8a6c40;
+  --accent:#d4a843;
+  --green:#3d7a4f;
+  --green2:#52a86a;
+  --text:#f0ede6;
+  --text2:#9a9485;
+  --text3:#5a554a;
+  --border:#2a2820;
+  --border2:#3a3628;
+  --sidebar-w:260px;
+  --header-h:64px;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden}
+
+/* CURSOR */
+*, *::before, *::after { cursor: none !important; }
+#cursor{position:fixed;width:12px;height:12px;background:var(--wood);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:transform 0.1s,background 0.2s,width 0.2s,height 0.2s;mix-blend-mode:difference}
+#cursor-ring{position:fixed;width:36px;height:36px;border:1px solid var(--wood);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:transform 0.15s ease,width 0.2s,height 0.2s,opacity 0.2s;opacity:0.5}
+body:has(a:hover) #cursor, body:has(button:hover) #cursor{width:20px;height:20px;background:var(--accent)}
+body:has(a:hover) #cursor-ring, body:has(button:hover) #cursor-ring{width:50px;height:50px;opacity:0.2}
+
+/* NOISE TEXTURE */
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:1;opacity:0.6}
+
+/* HEADER */
+header{position:fixed;top:0;left:0;right:0;height:var(--header-h);z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 2rem;border-bottom:1px solid var(--border);background:rgba(10,10,8,0.85);backdrop-filter:blur(20px)}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:0.05em;color:var(--wood);text-decoration:none;display:flex;align-items:center;gap:0.5rem}
+.logo span{color:var(--text);opacity:0.4;font-size:0.9rem;font-family:'Space Mono',monospace;letter-spacing:0.2em;align-self:flex-end;margin-bottom:4px}
+nav{display:flex;gap:2rem;align-items:center}
+nav a{color:var(--text2);text-decoration:none;font-size:0.8rem;letter-spacing:0.15em;text-transform:uppercase;font-weight:500;transition:color 0.2s;position:relative}
+nav a::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:1px;background:var(--wood);transition:width 0.3s}
+nav a:hover{color:var(--wood)}
+nav a:hover::after{width:100%}
+.nav-cta{background:var(--wood);color:var(--bg)!important;padding:0.5rem 1.2rem;border-radius:0;font-weight:700!important;letter-spacing:0.1em;text-transform:uppercase;font-size:0.75rem;transition:background 0.2s!important}
+.nav-cta:hover{background:var(--wood2)!important}
+.nav-cta::after{display:none!important}
+
+/* SIDEBAR */
+.layout{display:flex;margin-top:var(--header-h);min-height:calc(100vh - var(--header-h))}
+.sidebar{width:var(--sidebar-w);background:var(--bg2);border-right:1px solid var(--border);position:fixed;top:var(--header-h);left:0;bottom:0;z-index:90;display:flex;flex-direction:column;transform:translateX(-100%);transition:transform 0.4s cubic-bezier(0.16,1,0.3,1)}
+.sidebar.open{transform:translateX(0)}
+.sidebar-header{padding:1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.sidebar-header h3{font-family:'Space Mono',monospace;font-size:0.65rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--text3)}
+.sidebar-close{background:none;border:1px solid var(--border2);color:var(--text2);width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1rem;transition:all 0.2s}
+.sidebar-close:hover{background:var(--border2);color:var(--text)}
+.sidebar-nav{flex:1;overflow-y:auto;padding:1rem 0}
+.sidebar-nav a{display:flex;align-items:center;gap:0.75rem;padding:0.85rem 1.5rem;color:var(--text2);text-decoration:none;font-size:0.85rem;font-weight:400;letter-spacing:0.02em;border-left:2px solid transparent;transition:all 0.2s;position:relative}
+.sidebar-nav a .nav-icon{width:32px;height:32px;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-family:'Space Mono',monospace;color:var(--text3);flex-shrink:0;transition:all 0.2s}
+.sidebar-nav a:hover{color:var(--text);background:var(--bg3);border-left-color:var(--wood)}
+.sidebar-nav a:hover .nav-icon{background:var(--wood);color:var(--bg);border-color:var(--wood)}
+.sidebar-nav a.active{color:var(--wood);background:var(--bg3);border-left-color:var(--wood)}
+.sidebar-nav a.active .nav-icon{background:var(--wood);color:var(--bg);border-color:var(--wood)}
+.sidebar-footer{padding:1.5rem;border-top:1px solid var(--border)}
+.sdg-badge{background:var(--bg3);border:1px solid var(--border2);padding:0.75rem;display:flex;align-items:center;gap:0.75rem}
+.sdg-badge .sdg-num{font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--green2);line-height:1}
+.sdg-badge .sdg-text{font-size:0.65rem;color:var(--text3);line-height:1.4;letter-spacing:0.05em;text-transform:uppercase}
+
+/* SIDEBAR TOGGLE */
+.sidebar-toggle{position:fixed;top:calc(var(--header-h) + 1rem);left:1rem;z-index:95;background:var(--bg2);border:1px solid var(--border2);color:var(--text);width:40px;height:40px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.1rem;transition:all 0.2s}
+.sidebar-toggle:hover{background:var(--wood);color:var(--bg)}
+.sidebar-toggle.shifted{left:calc(var(--sidebar-w) + 1rem)}
+
+/* MAIN CONTENT */
+.main-area{flex:1;transition:margin-left 0.4s cubic-bezier(0.16,1,0.3,1)}
+.main-area.shifted{margin-left:var(--sidebar-w)}
+
+/* PAGES */
+.page{display:none;min-height:calc(100vh - var(--header-h))}
+.page.active{display:block}
+
+/* ====== HOME PAGE ====== */
+.hero{position:relative;min-height:100vh;display:flex;align-items:center;overflow:hidden;padding:0 4rem}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 60% 60% at 70% 50%,rgba(200,169,110,0.06) 0%,transparent 70%),radial-gradient(ellipse 40% 40% at 20% 80%,rgba(61,122,79,0.05) 0%,transparent 60%);pointer-events:none}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:60px 60px;opacity:0.3;pointer-events:none}
+.hero-content{position:relative;z-index:2;max-width:680px}
+.hero-tag{font-family:'Space Mono',monospace;font-size:0.65rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--wood3);margin-bottom:1.5rem;display:flex;align-items:center;gap:0.75rem}
+.hero-tag::before{content:'';display:block;width:40px;height:1px;background:var(--wood3)}
+h1.hero-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(4rem,10vw,8rem);line-height:0.9;letter-spacing:0.02em;color:var(--text)}
+h1.hero-title em{color:var(--wood);font-style:normal;display:block}
+.hero-sub{margin-top:1.5rem;font-size:1.05rem;color:var(--text2);line-height:1.7;max-width:460px;font-weight:300}
+.hero-actions{margin-top:2.5rem;display:flex;gap:1rem;align-items:center}
+.btn-primary{background:var(--wood);color:var(--bg);padding:1rem 2rem;font-weight:700;font-size:0.8rem;letter-spacing:0.15em;text-transform:uppercase;border:none;cursor:pointer;transition:all 0.2s;text-decoration:none;display:inline-flex;align-items:center;gap:0.5rem}
+.btn-primary:hover{background:var(--wood2);transform:translateY(-2px)}
+.btn-secondary{background:transparent;color:var(--text2);padding:1rem 2rem;font-weight:500;font-size:0.8rem;letter-spacing:0.15em;text-transform:uppercase;border:1px solid var(--border2);cursor:pointer;transition:all 0.2s;text-decoration:none;display:inline-flex;align-items:center;gap:0.5rem}
+.btn-secondary:hover{color:var(--text);border-color:var(--text2)}
+.hero-stats{margin-top:4rem;display:flex;gap:3rem}
+.stat{border-left:2px solid var(--wood3);padding-left:1rem}
+.stat-num{font-family:'Bebas Neue',sans-serif;font-size:2.5rem;color:var(--wood);line-height:1}
+.stat-label{font-size:0.7rem;color:var(--text3);letter-spacing:0.1em;text-transform:uppercase;margin-top:0.25rem}
+.hero-visual{position:absolute;right:4rem;top:50%;transform:translateY(-50%);width:380px;height:380px;z-index:2}
+.stand-visual{width:100%;height:100%;position:relative}
+.stand-svg{width:100%;height:100%}
+
+/* FEATURES STRIP */
+.features-strip{border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:3rem 4rem;display:grid;grid-template-columns:repeat(4,1fr);gap:2rem}
+.feature-card{padding:1.5rem;background:var(--bg2);border:1px solid var(--border);position:relative;overflow:hidden;transition:all 0.3s;cursor:pointer}
+.feature-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--wood);transform:scaleX(0);transition:transform 0.3s;transform-origin:left}
+.feature-card:hover{background:var(--bg3);transform:translateY(-4px)}
+.feature-card:hover::before{transform:scaleX(1)}
+.feature-icon{width:40px;height:40px;background:var(--bg);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;margin-bottom:1rem;font-size:1.1rem}
+.feature-num{font-family:'Space Mono',monospace;font-size:0.6rem;color:var(--text3);letter-spacing:0.2em;margin-bottom:0.5rem}
+.feature-card h3{font-size:0.95rem;font-weight:500;color:var(--text);margin-bottom:0.5rem}
+.feature-card p{font-size:0.8rem;color:var(--text2);line-height:1.6}
+
+/* SCROLLING MARQUEE */
+.marquee-wrap{overflow:hidden;border-bottom:1px solid var(--border);padding:1rem 0;background:var(--bg2)}
+.marquee-track{display:flex;gap:3rem;animation:marquee 20s linear infinite;white-space:nowrap;width:max-content}
+.marquee-item{font-family:'Space Mono',monospace;font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--text3);display:flex;align-items:center;gap:0.75rem}
+.marquee-item .dot{width:4px;height:4px;background:var(--wood);border-radius:50%}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* PRODUCT HIGHLIGHT */
+.product-section{padding:6rem 4rem;display:grid;grid-template-columns:1fr 1fr;gap:6rem;align-items:center}
+.product-label{font-family:'Space Mono',monospace;font-size:0.65rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--wood3);margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem}
+.product-label::before{content:'';display:block;width:24px;height:1px;background:var(--wood3)}
+.product-title{font-family:'Bebas Neue',sans-serif;font-size:3.5rem;line-height:0.95;margin-bottom:1.5rem;color:var(--text)}
+.product-desc{color:var(--text2);line-height:1.8;font-size:0.95rem;font-weight:300;margin-bottom:2rem}
+.spec-list{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:2rem}
+.spec-item{background:var(--bg2);border:1px solid var(--border);padding:0.75rem 1rem;display:flex;justify-content:space-between;align-items:center}
+.spec-key{font-size:0.7rem;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase}
+.spec-val{font-family:'Space Mono',monospace;font-size:0.8rem;color:var(--wood)}
+.product-img-wrap{background:var(--bg2);border:1px solid var(--border);aspect-ratio:1;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.product-img-wrap::after{content:'';position:absolute;bottom:0;left:0;right:0;height:40%;background:linear-gradient(transparent,var(--bg2))}
+.material-tag{position:absolute;top:1rem;right:1rem;background:var(--bg);border:1px solid var(--wood3);padding:0.4rem 0.75rem;font-family:'Space Mono',monospace;font-size:0.6rem;color:var(--wood3);letter-spacing:0.15em;text-transform:uppercase}
+
+/* SDG SECTION */
+.sdg-section{padding:6rem 4rem;background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.sdg-inner{max-width:1100px;margin:0 auto}
+.section-header{margin-bottom:4rem}
+.section-tag{font-family:'Space Mono',monospace;font-size:0.65rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--green2);margin-bottom:1rem;display:flex;align-items:center;gap:0.75rem}
+.section-tag::before{content:'';display:block;width:24px;height:1px;background:var(--green2)}
+.section-title{font-family:'Bebas Neue',sans-serif;font-size:3rem;line-height:0.95;color:var(--text)}
+.sdg-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.5rem}
+.sdg-card{background:var(--bg);border:1px solid var(--border);padding:2rem;position:relative;overflow:hidden;transition:all 0.3s}
+.sdg-card:hover{border-color:var(--green)}
+.sdg-big-num{font-family:'Bebas Neue',sans-serif;font-size:5rem;color:var(--green);opacity:0.12;position:absolute;top:-1rem;right:1rem;line-height:1;pointer-events:none}
+.sdg-card h3{font-size:0.9rem;font-weight:500;margin-bottom:0.75rem;color:var(--text)}
+.sdg-card p{font-size:0.8rem;color:var(--text2);line-height:1.6}
+.sdg-card .sdg-icon{width:36px;height:36px;background:var(--green);display:flex;align-items:center;justify-content:center;margin-bottom:1rem;font-size:1rem;color:#fff}
+
+/* TESTIMONIALS */
+.testimonials{padding:6rem 4rem}
+.testimonials-inner{max-width:1100px;margin:0 auto}
+.testimonials-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:3rem}
+.testimonial-card{background:var(--bg2);border:1px solid var(--border);padding:2rem;position:relative;transition:all 0.3s}
+.testimonial-card::before{content:'"';font-family:'Bebas Neue',sans-serif;font-size:6rem;color:var(--wood);opacity:0.1;position:absolute;top:-1rem;left:1.5rem;line-height:1}
+.testimonial-card:hover{border-color:var(--wood3);transform:translateY(-3px)}
+.testimonial-text{font-size:0.9rem;color:var(--text2);line-height:1.7;font-style:italic;margin-bottom:1.5rem;position:relative;z-index:1}
+.testimonial-author{display:flex;align-items:center;gap:0.75rem}
+.author-avatar{width:36px;height:36px;background:var(--wood3);display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:0.65rem;color:var(--bg);flex-shrink:0}
+.author-name{font-size:0.85rem;font-weight:500;color:var(--text)}
+.author-role{font-size:0.7rem;color:var(--text3);letter-spacing:0.05em}
+.stars{display:flex;gap:2px;margin-bottom:0.75rem}
+.star{width:12px;height:12px;background:var(--accent)}
+
+/* FAQ */
+.faq-section{padding:6rem 4rem;background:var(--bg2);border-top:1px solid var(--border)}
+.faq-inner{max-width:760px;margin:0 auto}
+.faq-list{margin-top:3rem}
+.faq-item{border-bottom:1px solid var(--border);overflow:hidden}
+.faq-q{width:100%;background:none;border:none;color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.95rem;font-weight:500;text-align:left;padding:1.5rem 0;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:color 0.2s;gap:1rem}
+.faq-q:hover{color:var(--wood)}
+.faq-arrow{width:24px;height:24px;background:var(--border2);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform 0.3s,background 0.2s;font-size:0.7rem}
+.faq-item.open .faq-arrow{transform:rotate(45deg);background:var(--wood);color:var(--bg)}
+.faq-a{max-height:0;overflow:hidden;transition:max-height 0.4s cubic-bezier(0.16,1,0.3,1);color:var(--text2);font-size:0.875rem;line-height:1.75;font-weight:300}
+.faq-item.open .faq-a{max-height:300px}
+.faq-a-inner{padding-bottom:1.5rem}
+
+/* PROGRESS TRACKER */
+.progress-section{padding:6rem 4rem}
+.progress-inner{max-width:1100px;margin:0 auto}
+.lifecycle{display:flex;gap:0;align-items:stretch;margin-top:3rem;position:relative}
+.lifecycle::before{content:'';position:absolute;top:50%;left:0;right:0;height:1px;background:var(--border2);z-index:0}
+.lifecycle-step{flex:1;text-align:center;position:relative;z-index:1;cursor:pointer}
+.lifecycle-dot{width:48px;height:48px;background:var(--bg);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;margin:0 auto;font-family:'Space Mono',monospace;font-size:0.7rem;color:var(--text3);transition:all 0.3s}
+.lifecycle-step:hover .lifecycle-dot,.lifecycle-step.active .lifecycle-dot{background:var(--wood);border-color:var(--wood);color:var(--bg)}
+.lifecycle-label{font-size:0.7rem;color:var(--text3);margin-top:0.75rem;letter-spacing:0.08em;text-transform:uppercase}
+.lifecycle-content{background:var(--bg2);border:1px solid var(--border);padding:2rem;margin-top:2rem;display:none}
+.lifecycle-content.active{display:block}
+.lifecycle-content h3{font-size:1rem;font-weight:500;color:var(--wood);margin-bottom:0.75rem}
+.lifecycle-content p{font-size:0.85rem;color:var(--text2);line-height:1.7}
+
+/* IMPACT COUNTER */
+.impact-strip{padding:4rem;background:var(--bg);border-top:1px solid var(--border);display:grid;grid-template-columns:repeat(4,1fr);gap:2rem}
+.impact-card{text-align:center;padding:2rem;background:var(--bg2);border:1px solid var(--border);position:relative;overflow:hidden}
+.impact-card::before{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--wood),transparent)}
+.impact-num{font-family:'Bebas Neue',sans-serif;font-size:3rem;color:var(--wood);line-height:1;display:block}
+.impact-label{font-size:0.7rem;color:var(--text3);letter-spacing:0.12em;text-transform:uppercase;margin-top:0.5rem}
+
+/* FOOTER */
+footer{background:var(--bg2);border-top:1px solid var(--border);padding:3rem 4rem;display:flex;justify-content:space-between;align-items:center}
+.footer-logo{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--wood)}
+.footer-links{display:flex;gap:2rem}
+.footer-links a{color:var(--text3);text-decoration:none;font-size:0.75rem;letter-spacing:0.1em;text-transform:uppercase;transition:color 0.2s}
+.footer-links a:hover{color:var(--wood)}
+.footer-copy{font-family:'Space Mono',monospace;font-size:0.65rem;color:var(--text3)}
+
+/* TAB PAGES */
+.tab-page{padding:4rem}
+.tab-page-header{margin-bottom:4rem;border-bottom:1px solid var(--border);padding-bottom:2rem}
+.tab-page-tag{font-family:'Space Mono',monospace;font-size:0.6rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--wood3);margin-bottom:0.75rem}
+.tab-page-title{font-family:'Bebas Neue',sans-serif;font-size:3rem;line-height:0.95;color:var(--text)}
+.tab-page-sub{font-size:0.9rem;color:var(--text2);margin-top:0.75rem;font-weight:300;line-height:1.7;max-width:600px}
+.content-block{margin-bottom:3rem}
+.content-block h3{font-size:1rem;font-weight:500;color:var(--wood);margin-bottom:0.75rem;letter-spacing:0.02em}
+.content-block p{font-size:0.875rem;color:var(--text2);line-height:1.8;font-weight:300}
+.info-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.5rem;margin-bottom:3rem}
+.info-card{background:var(--bg2);border:1px solid var(--border);padding:1.5rem}
+.info-card h4{font-size:0.8rem;font-weight:500;color:var(--text);margin-bottom:0.5rem;text-transform:uppercase;letter-spacing:0.08em;font-family:'Space Mono',monospace}
+.info-card p{font-size:0.8rem;color:var(--text2);line-height:1.6}
+.assembly-steps{counter-reset:step}
+.assembly-step{display:flex;gap:1.5rem;margin-bottom:2rem;padding:1.5rem;background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--wood)}
+.step-num{font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--wood);line-height:1;flex-shrink:0;width:40px}
+.step-content h4{font-size:0.9rem;font-weight:500;color:var(--text);margin-bottom:0.5rem}
+.step-content p{font-size:0.8rem;color:var(--text2);line-height:1.6}
+.material-table{width:100%;border-collapse:collapse;margin-bottom:2rem}
+.material-table th{text-align:left;padding:0.75rem 1rem;background:var(--bg3);border:1px solid var(--border);font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);font-weight:400;font-family:'Space Mono',monospace}
+.material-table td{padding:0.75rem 1rem;border:1px solid var(--border);font-size:0.8rem;color:var(--text2)}
+.material-table tr:hover td{background:var(--bg2)}
+.badge{display:inline-block;padding:0.25rem 0.6rem;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;font-family:'Space Mono',monospace}
+.badge-green{background:rgba(61,122,79,0.15);color:var(--green2);border:1px solid rgba(61,122,79,0.3)}
+.badge-amber{background:rgba(212,168,67,0.12);color:var(--accent);border:1px solid rgba(212,168,67,0.25)}
+
+/* ANIMATE ON SCROLL */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity 0.6s ease,transform 0.6s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+/* INTERACTIVE RANGE */
+.range-demo{background:var(--bg2);border:1px solid var(--border);padding:2rem;margin-bottom:2rem}
+.range-demo label{font-size:0.75rem;color:var(--text3);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.75rem;display:block}
+.range-demo input[type=range]{width:100%;accent-color:var(--wood);height:4px;margin-bottom:1rem}
+.range-output{font-family:'Space Mono',monospace;font-size:1.5rem;color:var(--wood)}
+.range-note{font-size:0.75rem;color:var(--text3);margin-top:0.5rem}
+
+@media(max-width:900px){
+  .hero{padding:6rem 2rem 3rem}
+  .hero-visual{display:none}
+  .features-strip{grid-template-columns:1fr 1fr;padding:2rem}
+  .product-section{grid-template-columns:1fr;gap:3rem;padding:3rem 2rem}
+  .sdg-grid{grid-template-columns:1fr;padding:3rem 2rem}
+  .sdg-section{padding:3rem 2rem}
+  .testimonials{padding:3rem 2rem}
+  .testimonials-grid{grid-template-columns:1fr}
+  .faq-section{padding:3rem 2rem}
+  .impact-strip{grid-template-columns:repeat(2,1fr);padding:2rem}
+  .progress-section{padding:3rem 2rem}
+  .tab-page{padding:2rem}
+  footer{flex-direction:column;gap:1.5rem;text-align:center;padding:2rem}
+  nav{display:none}
+  .lifecycle{flex-direction:column}
+  .lifecycle::before{display:none}
+  .info-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<header>
+  <a class="logo" href="#" onclick="showPage('home')">X-STAND <span>/ EDU</span></a>
+  <nav>
+    <a href="#" onclick="showPage('home');return false">Home</a>
+    <a href="#" onclick="toggleSidebar();return false">Explore</a>
+    <a href="#features" onclick="showPage('home');setTimeout(()=>document.getElementById('features').scrollIntoView({behavior:'smooth'}),100);return false">Features</a>
+    <a href="#" class="nav-cta" onclick="toggleSidebar();return false">View Sections ↗</a>
+  </nav>
+</header>
+
+<button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()" aria-label="Menu">☰</button>
+
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <h3>Navigation</h3>
+    <button class="sidebar-close" onclick="toggleSidebar()">✕</button>
+  </div>
+  <nav class="sidebar-nav">
+    <a href="#" onclick="showPage('home');toggleSidebar();return false" id="nav-home">
+      <div class="nav-icon">01</div>Home
+    </a>
+    <a href="#" onclick="showPage('about');toggleSidebar();return false" id="nav-about">
+      <div class="nav-icon">02</div>About X-Stand
+    </a>
+    <a href="#" onclick="showPage('materials');toggleSidebar();return false" id="nav-materials">
+      <div class="nav-icon">03</div>Materials & Build
+    </a>
+    <a href="#" onclick="showPage('sdg');toggleSidebar();return false" id="nav-sdg">
+      <div class="nav-icon">04</div>SDG 12 Impact
+    </a>
+    <a href="#" onclick="showPage('assembly');toggleSidebar();return false" id="nav-assembly">
+      <div class="nav-icon">05</div>Assembly Guide
+    </a>
+    <a href="#" onclick="showPage('lifecycle');toggleSidebar();return false" id="nav-lifecycle">
+      <div class="nav-icon">06</div>Lifecycle Analysis
+    </a>
+    <a href="#" onclick="showPage('research');toggleSidebar();return false" id="nav-research">
+      <div class="nav-icon">07</div>Research & Data
+    </a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="sdg-badge">
+      <div class="sdg-num">12</div>
+      <div class="sdg-text">UN Sustainable<br/>Development Goal<br/>Responsible Consumption</div>
+    </div>
+  </div>
+</div>
+
+<div class="main-area" id="mainArea">
+
+<!-- ===== HOME PAGE ===== -->
+<div class="page active" id="page-home">
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-grid"></div>
+    <div class="hero-content">
+      <div class="hero-tag">Flat-Pack · Birch Plywood · SDG 12</div>
+      <h1 class="hero-title">Extend<em>Your Life</em></h1>
+      <p class="hero-sub">A precision-engineered laptop stand carved from sustainable birch plywood. Designed for the circular economy — built to last, built to disassemble.</p>
+      <div class="hero-actions">
+        <a class="btn-primary" href="#" onclick="showPage('about');return false">Explore X-Stand →</a>
+        <a class="btn-secondary" href="#" onclick="toggleSidebar();return false">All Sections</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat"><div class="stat-num">100%</div><div class="stat-label">Birch Plywood</div></div>
+        <div class="stat"><div class="stat-num">0</div><div class="stat-label">Screws / Glue</div></div>
+        <div class="stat"><div class="stat-num">SDG</div><div class="stat-label">Goal 12 Aligned</div></div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <svg class="stand-svg" viewBox="0 0 380 380" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="190" cy="190" r="180" stroke="rgba(200,169,110,0.08)" stroke-width="1"/>
+        <circle cx="190" cy="190" r="140" stroke="rgba(200,169,110,0.05)" stroke-width="1" stroke-dasharray="4 8"/>
+        <circle cx="190" cy="190" r="100" stroke="rgba(200,169,110,0.06)" stroke-width="1"/>
+        <!-- Stand body -->
+        <rect x="90" y="100" width="200" height="14" rx="2" fill="#c8a96e" opacity="0.9"/>
+        <rect x="88" y="100" width="204" height="4" rx="1" fill="#e8c98a" opacity="0.7"/>
+        <!-- Left leg -->
+        <path d="M110 114 L80 260" stroke="#c8a96e" stroke-width="12" stroke-linecap="round" opacity="0.85"/>
+        <path d="M110 114 L80 260" stroke="#e8c98a" stroke-width="3" stroke-linecap="round" opacity="0.5"/>
+        <!-- Right leg -->
+        <path d="M270 114 L300 260" stroke="#c8a96e" stroke-width="12" stroke-linecap="round" opacity="0.85"/>
+        <path d="M270 114 L300 260" stroke="#e8c98a" stroke-width="3" stroke-linecap="round" opacity="0.5"/>
+        <!-- Base bar -->
+        <rect x="72" y="256" width="236" height="12" rx="2" fill="#c8a96e" opacity="0.9"/>
+        <!-- Cross brace -->
+        <path d="M110 180 L270 180" stroke="#c8a96e" stroke-width="6" opacity="0.5"/>
+        <!-- Wood grain lines on platform -->
+        <line x1="110" y1="103" x2="270" y2="103" stroke="#8a6c40" stroke-width="0.5" opacity="0.6"/>
+        <line x1="110" y1="106" x2="270" y2="106" stroke="#8a6c40" stroke-width="0.5" opacity="0.4"/>
+        <line x1="110" y1="109" x2="270" y2="109" stroke="#8a6c40" stroke-width="0.5" opacity="0.3"/>
+        <!-- Glow dots -->
+        <circle cx="190" cy="107" r="3" fill="rgba(232,201,138,0.6)"/>
+        <circle cx="80" cy="262" r="2.5" fill="rgba(200,169,110,0.4)"/>
+        <circle cx="300" cy="262" r="2.5" fill="rgba(200,169,110,0.4)"/>
+        <!-- Labels -->
+        <text x="320" y="108" font-family="'Space Mono',monospace" font-size="8" fill="rgba(200,169,110,0.5)" letter-spacing="1">PLATFORM</text>
+        <line x1="290" y1="107" x2="318" y2="107" stroke="rgba(200,169,110,0.3)" stroke-width="0.5"/>
+        <text x="315" y="265" font-family="'Space Mono',monospace" font-size="8" fill="rgba(200,169,110,0.5)" letter-spacing="1">BASE</text>
+        <line x1="308" y1="262" x2="313" y2="262" stroke="rgba(200,169,110,0.3)" stroke-width="0.5"/>
+      </svg>
+    </div>
+  </section>
+
+  <div class="marquee-wrap">
+    <div class="marquee-track">
+      <span class="marquee-item"><span class="dot"></span>Sustainable Design</span>
+      <span class="marquee-item"><span class="dot"></span>Flat-Pack Construction</span>
+      <span class="marquee-item"><span class="dot"></span>Birch Plywood</span>
+      <span class="marquee-item"><span class="dot"></span>Zero Waste Assembly</span>
+      <span class="marquee-item"><span class="dot"></span>UN SDG 12</span>
+      <span class="marquee-item"><span class="dot"></span>Circular Economy</span>
+      <span class="marquee-item"><span class="dot"></span>Responsible Production</span>
+      <span class="marquee-item"><span class="dot"></span>Ergonomic Engineering</span>
+      <span class="marquee-item"><span class="dot"></span>Sustainable Design</span>
+      <span class="marquee-item"><span class="dot"></span>Flat-Pack Construction</span>
+      <span class="marquee-item"><span class="dot"></span>Birch Plywood</span>
+      <span class="marquee-item"><span class="dot"></span>Zero Waste Assembly</span>
+      <span class="marquee-item"><span class="dot"></span>UN SDG 12</span>
+      <span class="marquee-item"><span class="dot"></span>Circular Economy</span>
+    </div>
+  </div>
+
+  <section class="features-strip" id="features">
+    <div class="feature-card reveal" onclick="showPage('materials')">
+      <div class="feature-num">01</div>
+      <div class="feature-icon">🌲</div>
+      <h3>Birch Plywood</h3>
+      <p>FSC-certified birch — strong, lightweight, and fully biodegradable at end of life.</p>
+    </div>
+    <div class="feature-card reveal" onclick="showPage('assembly')" style="transition-delay:0.1s">
+      <div class="feature-num">02</div>
+      <div class="feature-icon">🔩</div>
+      <h3>No Glue, No Screws</h3>
+      <p>Precision interlocking joints. Assemble and disassemble without any tools.</p>
+    </div>
+    <div class="feature-card reveal" onclick="showPage('sdg')" style="transition-delay:0.2s">
+      <div class="feature-num">03</div>
+      <div class="feature-icon">🌍</div>
+      <h3>SDG 12 Aligned</h3>
+      <p>Every design choice maps to responsible consumption and production principles.</p>
+    </div>
+    <div class="feature-card reveal" onclick="showPage('lifecycle')" style="transition-delay:0.3s">
+      <div class="feature-num">04</div>
+      <div class="feature-icon">♻️</div>
+      <h3>Circular Lifecycle</h3>
+      <p>From forest to flat-pack to composting — zero waste from end to end.</p>
+    </div>
+  </section>
+
+  <section class="product-section">
+    <div class="reveal">
+      <div class="product-label">The Product</div>
+      <h2 class="product-title">Precision Built From Nature</h2>
+      <p class="product-desc">X-Stand is a flat-pack laptop stand CNC-cut from 9mm birch plywood. Its interlocking design requires no adhesives, no screws — just smart geometry. When you're done with it, it disassembles in seconds and returns cleanly to the earth.</p>
+      <div class="spec-list">
+        <div class="spec-item"><span class="spec-key">Material</span><span class="spec-val">9mm Birch</span></div>
+        <div class="spec-item"><span class="spec-key">Weight</span><span class="spec-val">~320g</span></div>
+        <div class="spec-item"><span class="spec-key">Method</span><span class="spec-val">CNC Cut</span></div>
+        <div class="spec-item"><span class="spec-key">Fasteners</span><span class="spec-val">None</span></div>
+        <div class="spec-item"><span class="spec-key">Finish</span><span class="spec-val">Natural</span></div>
+        <div class="spec-item"><span class="spec-key">Angle</span><span class="spec-val">15°–25°</span></div>
+      </div>
+      <a class="btn-primary" href="#" onclick="showPage('assembly');return false">View Assembly →</a>
+    </div>
+    <div class="product-img-wrap reveal" style="transition-delay:0.2s">
+      <div class="material-tag">Birch Plywood</div>
+      <svg viewBox="0 0 400 400" width="100%" height="100%" style="padding:3rem">
+        <!-- Exploded flat-pack view -->
+        <rect x="80" y="60" width="240" height="18" rx="2" fill="#c8a96e" opacity="0.9"/>
+        <line x1="100" y1="63" x2="300" y2="63" stroke="#8a6c40" stroke-width="0.8" opacity="0.5"/>
+        <line x1="100" y1="68" x2="300" y2="68" stroke="#8a6c40" stroke-width="0.8" opacity="0.4"/>
+        <line x1="100" y1="73" x2="300" y2="73" stroke="#8a6c40" stroke-width="0.8" opacity="0.3"/>
+        <!-- Left side piece -->
+        <path d="M100 120 L60 220 L180 220 L180 120 Z" fill="#b89358" opacity="0.8"/>
+        <path d="M100 120 L60 220" stroke="#8a6c40" stroke-width="0.8" opacity="0.4"/>
+        <!-- Right side piece -->
+        <path d="M220 120 L340 220 L220 220 L220 120 Z" fill="#b89358" opacity="0.8"/>
+        <rect x="80" y="250" width="240" height="14" rx="2" fill="#c8a96e" opacity="0.75"/>
+        <!-- Crossbrace -->
+        <rect x="120" y="290" width="160" height="10" rx="1" fill="#c8a96e" opacity="0.6"/>
+        <!-- Dimension lines -->
+        <line x1="80" y1="340" x2="320" y2="340" stroke="rgba(200,169,110,0.25)" stroke-width="0.5"/>
+        <text x="200" y="355" font-family="'Space Mono',monospace" font-size="9" fill="rgba(200,169,110,0.4)" text-anchor="middle">240mm</text>
+      </svg>
+    </div>
+  </section>
+
+  <section class="sdg-section">
+    <div class="sdg-inner">
+      <div class="section-header reveal">
+        <div class="section-tag">Sustainability</div>
+        <h2 class="section-title">UN SDG 12 — RESPONSIBLE CONSUMPTION</h2>
+      </div>
+      <div class="sdg-grid">
+        <div class="sdg-card reveal">
+          <div class="sdg-big-num">A</div>
+          <div class="sdg-icon">🌱</div>
+          <h3>Sustainable Sourcing</h3>
+          <p>Birch plywood from responsibly managed forests. Every board is traceable, certified, and ethically harvested to preserve forest biodiversity.</p>
+        </div>
+        <div class="sdg-card reveal" style="transition-delay:0.1s">
+          <div class="sdg-big-num">B</div>
+          <div class="sdg-icon">🔄</div>
+          <h3>Minimal Waste Production</h3>
+          <p>CNC cutting is optimised to use as much of each sheet as possible. Off-cuts are repurposed or composted — nothing reaches landfill.</p>
+        </div>
+        <div class="sdg-card reveal" style="transition-delay:0.2s">
+          <div class="sdg-big-num">C</div>
+          <div class="sdg-icon">♻️</div>
+          <h3>End-of-Life Return</h3>
+          <p>When X-Stand reaches the end of its functional life, it disassembles fully and can be composted, repaired, or repurposed with no toxic residue.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LIFECYCLE INTERACTIVE -->
+  <section class="progress-section">
+    <div class="progress-inner">
+      <div class="section-header reveal">
+        <div class="section-tag">Journey</div>
+        <h2 class="section-title" style="font-family:'Bebas Neue',sans-serif;font-size:3rem">Product Lifecycle</h2>
+      </div>
+      <div class="lifecycle reveal">
+        <div class="lifecycle-step active" onclick="selectLifecycle(this,'lc1')">
+          <div class="lifecycle-dot">01</div>
+          <div class="lifecycle-label">Forest</div>
+        </div>
+        <div class="lifecycle-step" onclick="selectLifecycle(this,'lc2')">
+          <div class="lifecycle-dot">02</div>
+          <div class="lifecycle-label">Mill</div>
+        </div>
+        <div class="lifecycle-step" onclick="selectLifecycle(this,'lc3')">
+          <div class="lifecycle-dot">03</div>
+          <div class="lifecycle-label">CNC Cut</div>
+        </div>
+        <div class="lifecycle-step" onclick="selectLifecycle(this,'lc4')">
+          <div class="lifecycle-dot">04</div>
+          <div class="lifecycle-label">Pack</div>
+        </div>
+        <div class="lifecycle-step" onclick="selectLifecycle(this,'lc5')">
+          <div class="lifecycle-dot">05</div>
+          <div class="lifecycle-label">Use</div>
+        </div>
+        <div class="lifecycle-step" onclick="selectLifecycle(this,'lc6')">
+          <div class="lifecycle-dot">06</div>
+          <div class="lifecycle-label">Return</div>
+        </div>
+      </div>
+      <div id="lc1" class="lifecycle-content active">
+        <h3>🌲 Sustainably Managed Forest</h3>
+        <p>Birch trees are harvested from FSC-certified forests in Northern Europe. Selective harvesting ensures biodiversity is preserved and new growth replaces every tree removed. The forest acts as a carbon sink throughout the tree's growth phase.</p>
+      </div>
+      <div id="lc2" class="lifecycle-content">
+        <h3>🏭 Plywood Milling</h3>
+        <p>Logs are peeled into thin veneers and cross-laminated under pressure to create strong, stable 9mm birch plywood sheets. The lamination process uses minimal, non-toxic adhesives that do not affect biodegradability.</p>
+      </div>
+      <div id="lc3" class="lifecycle-content">
+        <h3>⚙️ CNC Precision Cutting</h3>
+        <p>Each X-Stand is CNC-cut from a single sheet, with the cut paths optimised using nesting software to minimise waste. No paint, no toxic finish. The natural wood surface is sanded smooth and left in its natural state.</p>
+      </div>
+      <div id="lc4" class="lifecycle-content">
+        <h3>📦 Flat-Pack Packaging</h3>
+        <p>Parts lay flat and are packaged in a minimal cardboard sleeve — no foam, no plastic. The flat format drastically reduces shipping volume, lowering transport emissions per unit by up to 60% compared to assembled alternatives.</p>
+      </div>
+      <div id="lc5" class="lifecycle-content">
+        <h3>💻 In Use</h3>
+        <p>X-Stand raises your laptop screen to eye level, reducing neck and back strain. Elevated airflow underneath the laptop also helps it run cooler, potentially extending device lifespan — reducing the need for replacement tech.</p>
+      </div>
+      <div id="lc6" class="lifecycle-content">
+        <h3>♻️ End of Life Return</h3>
+        <p>When the stand is no longer needed, it disassembles into flat pieces in under 30 seconds. Parts can be composted, donated, repurposed as shelf material, or returned to a partner collection point for recirculation.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- IMPACT NUMBERS -->
+  <div class="impact-strip">
+    <div class="impact-card reveal">
+      <span class="impact-num" id="c1">0</span>
+      <div class="impact-label">Plastic Components</div>
+    </div>
+    <div class="impact-card reveal" style="transition-delay:0.1s">
+      <span class="impact-num" id="c2">0</span>
+      <div class="impact-label">Adhesives Used</div>
+    </div>
+    <div class="impact-card reveal" style="transition-delay:0.2s">
+      <span class="impact-num" id="c3">0%</span>
+      <div class="impact-label">Assembly Tools Needed</div>
+    </div>
+    <div class="impact-card reveal" style="transition-delay:0.3s">
+      <span class="impact-num" id="c4">100%</span>
+      <div class="impact-label">Biodegradable Material</div>
+    </div>
+  </div>
+
+  <!-- TESTIMONIALS -->
+  <section class="testimonials">
+    <div class="testimonials-inner">
+      <div class="section-header reveal">
+        <div class="section-tag" style="color:var(--wood3)">Testimonials</div>
+        <h2 class="section-title" style="font-family:'Bebas Neue',sans-serif;font-size:3rem">What People Say</h2>
+      </div>
+      <div class="testimonials-grid">
+        <div class="testimonial-card reveal">
+          <div class="stars"><div class="star"></div><div class="star"></div><div class="star"></div><div class="star"></div><div class="star"></div></div>
+          <p class="testimonial-text">Using X-Stand completely changed how I feel about working from home. My neck pain is gone and I love knowing the product itself has a clear environmental story behind it.</p>
+          <div class="testimonial-author">
+            <div class="author-avatar">SP</div>
+            <div><div class="author-name">Sarah P.</div><div class="author-role">UX Designer, Singapore</div></div>
+          </div>
+        </div>
+        <div class="testimonial-card reveal" style="transition-delay:0.1s">
+          <div class="stars"><div class="star"></div><div class="star"></div><div class="star"></div><div class="star"></div><div class="star"></div></div>
+          <p class="testimonial-text">I've tried dozens of laptop stands. X-Stand is the only one I've kept. No screws, no plastic, no hassle — and it looks incredible on my desk.</p>
+          <div class="testimonial-author">
+            <div class="author-avatar">MK</div>
+            <div><div class="author-name">Marcus K.</div><div class="author-role">Software Engineer, Berlin</div></div>
+          </div>
+        </div>
+        <div class="testimonial-card reveal" style="transition-delay:0.2s">
+          <div class="stars"><div class="star"></div><div class="star"></div><div class="star"></div><div class="star"></div><div class="star"></div></div>
+          <p class="testimonial-text">We gifted X-Stands to our entire team as part of our sustainability initiative. The flat-pack design made shipping easy and the team absolutely loved them.</p>
+          <div class="testimonial-author">
+            <div class="author-avatar">AL</div>
+            <div><div class="author-name">Aisha L.</div><div class="author-role">Sustainability Lead, London</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="faq-section">
+    <div class="faq-inner">
+      <div class="section-header reveal">
+        <div class="section-tag">Got Questions?</div>
+        <h2 class="section-title" style="font-family:'Bebas Neue',sans-serif;font-size:3rem">FAQ</h2>
+      </div>
+      <div class="faq-list reveal">
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            What is X-Stand made from?
+            <div class="faq-arrow">+</div>
+          </button>
+          <div class="faq-a"><div class="faq-a-inner">X-Stand is made entirely from 9mm FSC-certified birch plywood. There are no plastic components, no metal fasteners, and no adhesives used in the final product. The material is sustainably sourced and fully biodegradable.</div></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            Do I need tools to assemble it?
+            <div class="faq-arrow">+</div>
+          </button>
+          <div class="faq-a"><div class="faq-a-inner">No tools are required at any point. The interlocking joint system uses precision-cut slots that fit together by hand. Assembly takes approximately 2–3 minutes and no technical skill is needed.</div></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            How does X-Stand connect to SDG 12?
+            <div class="faq-arrow">+</div>
+          </button>
+          <div class="faq-a"><div class="faq-a-inner">UN Sustainable Development Goal 12 targets responsible consumption and production. X-Stand directly addresses this by using sustainably sourced materials, minimising manufacturing waste through CNC nesting optimisation, eliminating plastic and non-recyclable components, and designing for full end-of-life disassembly and compostability.</div></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            What happens when X-Stand wears out?
+            <div class="faq-arrow">+</div>
+          </button>
+          <div class="faq-a"><div class="faq-a-inner">The stand disassembles completely into flat birch plywood pieces. These can be composted in a home or industrial compost, used as kindling, repurposed for shelving or art projects, or returned to a collection partner for recirculation. Nothing needs to go to landfill.</div></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            What laptop sizes does it support?
+            <div class="faq-arrow">+</div>
+          </button>
+          <div class="faq-a"><div class="faq-a-inner">X-Stand is designed to support laptops from 12" to 16" in screen size. The platform width accommodates all standard laptop chassis widths, and the angle provides an ergonomically optimal 15–25° viewing elevation.</div></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-q" onclick="toggleFaq(this)">
+            Is X-Stand an educational project?
+            <div class="faq-arrow">+</div>
+          </button>
+          <div class="faq-a"><div class="faq-a-inner">Yes — X-Stand was developed as an educational design project exploring sustainable product design principles, circular economy thinking, and the application of UN Sustainable Development Goals in physical product development. This website documents its design rationale, material choices, and environmental impact analysis.</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-logo">X-STAND</div>
+    <div class="footer-links">
+      <a href="#" onclick="showPage('about');return false">About</a>
+      <a href="#" onclick="showPage('sdg');return false">SDG 12</a>
+      <a href="#" onclick="showPage('materials');return false">Materials</a>
+      <a href="#" onclick="showPage('assembly');return false">Assembly</a>
+    </div>
+    <div class="footer-copy">© 2025 X-Stand / SDG 12 Educational Project</div>
+  </footer>
+</div>
+
+<!-- ===== ABOUT PAGE ===== -->
+<div class="page" id="page-about">
+  <div class="tab-page">
+    <div class="tab-page-header reveal">
+      <div class="tab-page-tag">02 / About</div>
+      <h1 class="tab-page-title">About X-Stand</h1>
+      <p class="tab-page-sub">X-Stand is a flat-pack birch plywood laptop stand designed at the intersection of ergonomics, sustainable engineering, and circular economy principles.</p>
+    </div>
+    <div class="content-block reveal">
+      <h3>The Design Challenge</h3>
+      <p>The brief was to create a functional desktop product that embodies the principles of UN SDG 12 — Responsible Consumption and Production. This meant rethinking every material choice, every manufacturing step, and every end-of-life scenario from the very first sketch.</p>
+    </div>
+    <div class="info-grid">
+      <div class="info-card reveal">
+        <h4>Project Type</h4>
+        <p>Educational sustainable product design — exploring how everyday objects can be redesigned around circular economy principles.</p>
+      </div>
+      <div class="info-card reveal" style="transition-delay:0.1s">
+        <h4>Design Philosophy</h4>
+        <p>Less is more. Every component that is removed is a component that cannot become waste. X-Stand strips the laptop stand to its essential geometry.</p>
+      </div>
+      <div class="info-card reveal" style="transition-delay:0.2s">
+        <h4>Manufacturing Approach</h4>
+        <p>CNC routing on standard birch plywood sheets with optimised nesting to maximise material yield and minimise offcut waste.</p>
+      </div>
+      <div class="info-card reveal" style="transition-delay:0.3s">
+        <h4>Target User</h4>
+        <p>Remote workers, students, and sustainability-conscious professionals who want both ergonomic benefit and environmental responsibility.</p>
+      </div>
+    </div>
+    <div class="content-block reveal">
+      <h3>Why Birch Plywood?</h3>
+      <p>Birch plywood is one of the most material-efficient structural woods available. Its cross-laminated grain structure provides exceptional strength-to-weight ratio, meaning less material is needed per stand. It machines cleanly with CNC tooling, leaves no toxic dust, requires no sealant, and at end of life biodegrades completely without releasing harmful compounds.</p>
+    </div>
+    <div class="content-block reveal">
+      <h3>The Name</h3>
+      <p>X-Stand takes its name from the X-shaped cross-section formed by the interlocking side panels. This X geometry is not just aesthetic — it is structurally efficient, distributing load symmetrically and providing exceptional lateral stability without any additional bracing components.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MATERIALS PAGE ===== -->
+<div class="page" id="page-materials">
+  <div class="tab-page">
+    <div class="tab-page-header reveal">
+      <div class="tab-page-tag">03 / Materials</div>
+      <h1 class="tab-page-title">Materials & Build</h1>
+      <p class="tab-page-sub">Every material in X-Stand was selected through the lens of SDG 12 — evaluating source, processing, function, and end-of-life.</p>
+    </div>
+    <table class="material-table reveal">
+      <thead>
+        <tr><th>Component</th><th>Material</th><th>Source</th><th>End of Life</th><th>Status</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Platform</td><td>9mm Birch Plywood</td><td>FSC Forest, N. Europe</td><td>Compostable</td><td><span class="badge badge-green">Sustainable</span></td></tr>
+        <tr><td>Side Legs</td><td>9mm Birch Plywood</td><td>FSC Forest, N. Europe</td><td>Compostable</td><td><span class="badge badge-green">Sustainable</span></td></tr>
+        <tr><td>Cross Brace</td><td>9mm Birch Plywood</td><td>FSC Forest, N. Europe</td><td>Compostable</td><td><span class="badge badge-green">Sustainable</span></td></tr>
+        <tr><td>Base Rail</td><td>9mm Birch Plywood</td><td>FSC Forest, N. Europe</td><td>Compostable</td><td><span class="badge badge-green">Sustainable</span></td></tr>
+        <tr><td>Packaging</td><td>Recycled Cardboard</td><td>Post-consumer waste</td><td>Recyclable</td><td><span class="badge badge-amber">Good</span></td></tr>
+        <tr><td>Fasteners</td><td>None</td><td>—</td><td>—</td><td><span class="badge badge-green">Zero Waste</span></td></tr>
+        <tr><td>Surface Finish</td><td>None (natural)</td><td>—</td><td>—</td><td><span class="badge badge-green">Zero Chemicals</span></td></tr>
+      </tbody>
+    </table>
+
+    <div class="range-demo reveal">
+      <label>Explore: How much CO₂ is saved vs a plastic laptop stand?</label>
+      <input type="range" min="1" max="100" value="50" id="unitRange" oninput="updateCO2(this.value)" step="1"/>
+      <div class="range-output" id="co2out">~1.2 kg CO₂ saved</div>
+      <div class="range-note" id="co2note">Across 50 units compared to equivalent injection-moulded plastic stands</div>
+    </div>
+
+    <div class="content-block reveal">
+      <h3>Birch Plywood Properties</h3>
+      <p>Birch plywood at 9mm thickness has a density of approximately 680 kg/m³ and a modulus of rupture around 50 MPa — more than sufficient for the loads a laptop stand will encounter. The cross-laminated veneer structure resists warping and splitting across temperature and humidity cycles typical of indoor environments.</p>
+    </div>
+    <div class="content-block reveal">
+      <h3>CNC Manufacturing Precision</h3>
+      <p>The interlocking joints require tolerances of ±0.2mm to function correctly. CNC routing achieves this repeatably, allowing flat-pack assembly without any adjustment or fitting. The joint geometry uses a stepped mortise-and-tenon variant that self-squares during assembly.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SDG PAGE ===== -->
+<div class="page" id="page-sdg">
+  <div class="tab-page">
+    <div class="tab-page-header reveal">
+      <div class="tab-page-tag">04 / Impact</div>
+      <h1 class="tab-page-title">SDG 12 Deep Dive</h1>
+      <p class="tab-page-sub">UN Sustainable Development Goal 12 — Responsible Consumption and Production — underpins every decision in X-Stand's design.</p>
+    </div>
+    <div class="content-block reveal">
+      <h3>What is SDG 12?</h3>
+      <p>SDG 12 is one of 17 global goals set by the United Nations in 2015 as part of the 2030 Agenda for Sustainable Development. It specifically addresses the unsustainable patterns of production and consumption that drive resource depletion, pollution, and climate breakdown. SDG 12 calls for a fundamental shift — not just in how we make things, but in how we design them from the outset.</p>
+    </div>
+    <div class="info-grid">
+      <div class="info-card reveal">
+        <h4>Target 12.2</h4>
+        <p>Achieve sustainable management and efficient use of natural resources. X-Stand uses the minimum material required and sources from certified sustainable forestry.</p>
+      </div>
+      <div class="info-card reveal" style="transition-delay:0.1s">
+        <h4>Target 12.5</h4>
+        <p>Substantially reduce waste generation through prevention, reduction, reuse and recycling. X-Stand produces zero non-recyclable waste across its lifecycle.</p>
+      </div>
+      <div class="info-card reveal" style="transition-delay:0.2s">
+        <h4>Target 12.6</h4>
+        <p>Encourage companies to adopt sustainable practices. This project models how sustainable design principles can be embedded into everyday product development.</p>
+      </div>
+      <div class="info-card reveal" style="transition-delay:0.3s">
+        <h4>Target 12.8</h4>
+        <p>Ensure relevant information for sustainable development is available to all. This educational website fulfils the awareness and knowledge-sharing mission of SDG 12.</p>
+      </div>
+    </div>
+    <div class="content-block reveal">
+      <h3>Circular Economy Principles</h3>
+      <p>The circular economy framework — popularised by the Ellen MacArthur Foundation — advocates for designing out waste, keeping products and materials in use, and regenerating natural systems. X-Stand embodies all three: waste is designed out through joint geometry and material optimisation; the stand can remain in use through repair and disassembly; and its materials return to the biosphere at end of life.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== ASSEMBLY PAGE ===== -->
+<div class="page" id="page-assembly">
+  <div class="tab-page">
+    <div class="tab-page-header reveal">
+      <div class="tab-page-tag">05 / Assembly</div>
+      <h1 class="tab-page-title">Assembly Guide</h1>
+      <p class="tab-page-sub">No tools. No screws. No confusion. X-Stand assembles in approximately 2 minutes using only your hands.</p>
+    </div>
+    <div class="assembly-steps reveal">
+      <div class="assembly-step">
+        <div class="step-num">01</div>
+        <div class="step-content">
+          <h4>Unpack the Flat Parts</h4>
+          <p>Remove all pieces from the cardboard sleeve. You will find: one platform piece, two identical side leg panels, one cross brace, and one base rail. Lay them flat on your desk.</p>
+        </div>
+      </div>
+      <div class="assembly-step">
+        <div class="step-num">02</div>
+        <div class="step-content">
+          <h4>Connect the Side Legs</h4>
+          <p>Take both side leg panels and slide them together at the central X-slot. The slot in each piece aligns at the midpoint. Press together firmly until flush — the joint should click into position with light hand pressure.</p>
+        </div>
+      </div>
+      <div class="assembly-step">
+        <div class="step-num">03</div>
+        <div class="step-content">
+          <h4>Attach the Base Rail</h4>
+          <p>Slide the base rail into the corresponding slots at the bottom of both side legs. The rail spans the full width and locks the lower section rigid. No force needed — if it resists, check alignment.</p>
+        </div>
+      </div>
+      <div class="assembly-step">
+        <div class="step-num">04</div>
+        <div class="step-content">
+          <h4>Insert the Cross Brace</h4>
+          <p>The cross brace slots horizontally between the two side panels at mid-height. It provides lateral rigidity and is the last structural element. Drop it into place from above.</p>
+        </div>
+      </div>
+      <div class="assembly-step">
+        <div class="step-num">05</div>
+        <div class="step-content">
+          <h4>Set the Platform</h4>
+          <p>Place the platform piece on top of the side leg frame. The platform rests in the angled notches cut into the top of each leg panel, sitting at approximately 20° elevation. It does not require fixing — gravity and friction hold it securely.</p>
+        </div>
+      </div>
+      <div class="assembly-step">
+        <div class="step-num">06</div>
+        <div class="step-content">
+          <h4>Ready to Use</h4>
+          <p>Place your laptop on the platform. The raised angle reduces neck and shoulder strain by bringing the screen closer to eye level. Pair with a separate keyboard for the best ergonomic setup.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== LIFECYCLE PAGE ===== -->
+<div class="page" id="page-lifecycle">
+  <div class="tab-page">
+    <div class="tab-page-header reveal">
+      <div class="tab-page-tag">06 / Lifecycle</div>
+      <h1 class="tab-page-title">Lifecycle Analysis</h1>
+      <p class="tab-page-sub">A full lifecycle assessment maps X-Stand's environmental impact from raw material extraction through to end-of-life.</p>
+    </div>
+    <div class="content-block reveal">
+      <h3>What is a Lifecycle Assessment?</h3>
+      <p>A Lifecycle Assessment (LCA) is a systematic method for evaluating the environmental impacts of a product throughout its entire life — from raw material extraction ("cradle") through manufacturing, use, and disposal ("grave"). For truly circular products, this extends to "cradle-to-cradle" — where the end of one life feeds the start of another.</p>
+    </div>
+    <div class="info-grid">
+      <div class="info-card reveal">
+        <h4>Raw Material Phase</h4>
+        <p>Birch harvesting sequesters carbon during tree growth. Transport from Northern Europe to manufacturing is the primary carbon cost in this phase.</p>
+      </div>
+      <div class="info-card reveal" style="transition-delay:0.1s">
+        <h4>Manufacturing Phase</h4>
+        <p>CNC routing is electrically powered. Using renewable energy sources at this stage reduces the manufacturing footprint to near-zero carbon emissions.</p>
+      </div>
+      <div class="info-card reveal" style="transition-delay:0.2s">
+        <h4>Distribution Phase</h4>
+        <p>Flat-pack format reduces shipping volume by up to 60% vs assembled products of equivalent function, dramatically cutting per-unit transport emissions.</p>
+      </div>
+      <div class="info-card reveal" style="transition-delay:0.3s">
+        <h4>End-of-Life Phase</h4>
+        <p>Composting returns carbon to the soil. No landfill gases, no toxic leachate, no recycling energy cost — the cleanest possible end-of-life scenario for a product.</p>
+      </div>
+    </div>
+    <div class="content-block reveal">
+      <h3>Comparison with Alternatives</h3>
+      <p>A typical injection-moulded plastic laptop stand requires approximately 2.8 kg CO₂e in its production, generates non-recyclable mixed plastic waste at end of life, and contributes to microplastic pollution. An aluminium stand requires even higher initial energy input. X-Stand's total lifecycle carbon footprint, assuming renewable energy in manufacturing, is estimated at approximately 0.4–0.6 kg CO₂e — a reduction of over 75% against plastic equivalents.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== RESEARCH PAGE ===== -->
+<div class="page" id="page-research">
+  <div class="tab-page">
+    <div class="tab-page-header reveal">
+      <div class="tab-page-tag">07 / Research</div>
+      <h1 class="tab-page-title">Research & Data</h1>
+      <p class="tab-page-sub">The design decisions behind X-Stand are grounded in published research on sustainable materials, ergonomics, and circular economy frameworks.</p>
+    </div>
+    <div class="content-block reveal">
+      <h3>Ergonomics Research</h3>
+      <p>Studies by the International Journal of Industrial Ergonomics indicate that laptop use without a stand creates persistent head-forward posture, increasing neck muscle load by up to 60% compared to desktop monitor setups. Raising screen height to eye level with a 15–20° platform elevation significantly reduces this musculoskeletal load. X-Stand's platform angle was determined based on this research.</p>
+    </div>
+    <div class="content-block reveal">
+      <h3>Plywood Structural Data</h3>
+      <p>EN 636 Class 1 birch plywood (9mm) tested to EN 789 yields characteristic bending strength values of 28–36 MPa and modulus of elasticity of 6,500–8,000 MPa. Structural analysis of the X-Stand geometry under a maximum laptop load of 3.5 kg shows maximum stress values well below 15% of the material's failure threshold — an ample safety factor for the application.</p>
+    </div>
+    <div class="content-block reveal">
+      <h3>SDG 12 Framework</h3>
+      <p>The United Nations Environment Programme (UNEP) 2023 report on global material flows indicates that material consumption is projected to nearly double by 2060 under business-as-usual scenarios. Sustainable product design — including the principles embodied in X-Stand — is identified as a key lever in reducing this trajectory. The circular economy alone could halve industrial CO₂ emissions by 2050 according to Ellen MacArthur Foundation modelling.</p>
+    </div>
+    <div class="info-grid">
+      <div class="info-card reveal">
+        <h4>Key References</h4>
+        <p>UN SDG 12 Official Framework · Ellen MacArthur Foundation Circular Economy Reports · UNEP Material Flow Analysis 2023 · EN 636 Plywood Standards · Fung et al. (2018) Laptop Ergonomics</p>
+      </div>
+      <div class="info-card reveal" style="transition-delay:0.1s">
+        <h4>Data Integrity Note</h4>
+        <p>Carbon footprint figures are estimates based on published industry average data for FSC birch plywood production in Northern Europe and standard CNC routing energy consumption figures.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end main-area -->
+
+<script>
+// CURSOR
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursor-ring');
+document.addEventListener('mousemove', e => {
+  cursor.style.left = e.clientX + 'px';
+  cursor.style.top = e.clientY + 'px';
+  ring.style.left = e.clientX + 'px';
+  ring.style.top = e.clientY + 'px';
+});
+
+// SIDEBAR
+let sidebarOpen = false;
+function toggleSidebar() {
+  sidebarOpen = !sidebarOpen;
+  document.getElementById('sidebar').classList.toggle('open', sidebarOpen);
+  document.getElementById('mainArea').classList.toggle('shifted', sidebarOpen);
+  const tog = document.getElementById('sidebarToggle');
+  tog.classList.toggle('shifted', sidebarOpen);
+  tog.textContent = sidebarOpen ? '✕' : '☰';
+}
+
+// PAGE SWITCHING
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
+  const navEl = document.getElementById('nav-' + id);
+  if (navEl) navEl.classList.add('active');
+  window.scrollTo(0, 0);
+  setTimeout(() => observeReveal(), 100);
+}
+
+// FAQ TOGGLE
+function toggleFaq(btn) {
+  const item = btn.parentElement;
+  const wasOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+  if (!wasOpen) item.classList.add('open');
+}
+
+// LIFECYCLE TABS
+function selectLifecycle(step, contentId) {
+  document.querySelectorAll('.lifecycle-step').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.lifecycle-content').forEach(c => c.classList.remove('active'));
+  step.classList.add('active');
+  document.getElementById(contentId).classList.add('active');
+}
+
+// CO2 CALCULATOR
+function updateCO2(val) {
+  const kg = (parseFloat(val) * 0.024).toFixed(1);
+  document.getElementById('co2out').textContent = '~' + kg + ' kg CO₂ saved';
+  document.getElementById('co2note').textContent = 'Across ' + val + ' units compared to equivalent injection-moulded plastic stands';
+}
+
+// SCROLL REVEAL
+function observeReveal() {
+  const els = document.querySelectorAll('.reveal:not(.visible)');
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }});
+  }, {threshold: 0.1});
+  els.forEach(el => obs.observe(el));
+}
+observeReveal();
+
+// COUNTER ANIMATION
+function animateCounter(el, target, suffix) {
+  let current = 0;
+  const step = Math.ceil(target / 40);
+  const timer = setInterval(() => {
+    current = Math.min(current + step, target);
+    el.textContent = current + suffix;
+    if (current >= target) clearInterval(timer);
+  }, 30);
+}
+const counterObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      animateCounter(document.getElementById('c1'), 0, '');
+      animateCounter(document.getElementById('c2'), 0, '');
+      document.getElementById('c3').textContent = '0%';
+      document.getElementById('c4').textContent = '100%';
+      counterObs.disconnect();
+    }
+  });
+}, {threshold: 0.5});
+const impactStrip = document.querySelector('.impact-strip');
+if (impactStrip) counterObs.observe(impactStrip);
+</script>
+</body>
+</html>
